@@ -1,8 +1,9 @@
-package com.saleh.mariobro.Tools;
+package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -10,32 +11,35 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.saleh.mariobro.MarioBros;
-import com.saleh.mariobro.Screens.PlayScreen;
-import com.saleh.mariobro.Sprites.Mario;
 
 /**
- * Created by user on 24/05/2016.
+ * Created by user on 30/05/2016.
  */
-public class Controller {// after creating draw method and typing stage.draw then left click on controller and generate getter for
-    // down left right up images
-    Viewport viewport;
-    Stage stage;
-    boolean upPressed,downPressed,leftPressed,rightPressed;
-    OrthographicCamera cam;
-    public Controller()
-    {
-        cam=new OrthographicCamera();
-        viewport=new FitViewport(800,400,cam);
-        stage=new Stage(viewport,MarioBros.batch);
+public class Controller {
+    public Viewport viewport;
+    public Stage stage;
+    public boolean upPressed;
+    public boolean leftPressed;
+    public boolean rightPressed;
+    public Image buttonUp;
+    public Image buttonDown;
+    public Image buttonLeft;
+    public Image buttonRight;
+    public OrthographicCamera camera;
+    public Table table;
+    public Table table1;
+
+    //Constructor.
+    public Controller(SpriteBatch spriteBatch) {
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(Fruits.V_WIDTH, Fruits.V_HIEGT, camera);
+        stage = new Stage(viewport, spriteBatch);
         Gdx.input.setInputProcessor(stage);
 
-        Table table=new Table();
-        table.right().bottom();
-        Image upImage=new Image(new Texture("flatDark25.png"));
-        upImage.setSize(50,50);
-        upImage.addListener(new InputListener() {
-
+        //Buttons with images.
+        buttonUp = new Image(new Texture("buttonup.png"));
+        buttonUp.setSize(25, 25);
+        buttonUp.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 upPressed = true;
@@ -47,25 +51,10 @@ public class Controller {// after creating draw method and typing stage.draw the
                 upPressed = false;
             }
         });
-        Image downImage=new Image(new Texture("flatDark26.png"));
-        downImage.setSize(50,50);
-        downImage.addListener(new InputListener() {
 
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                downPressed = true;
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                downPressed = false;
-            }
-        });
-        final Image leftImage=new Image(new Texture("flatDark23.png"));
-        leftImage.setSize(50,50);
-        leftImage.addListener(new InputListener() {
-
+        buttonLeft = new Image(new Texture("buttonleft.png"));
+        buttonLeft.setSize(65, 65);
+        buttonLeft.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 leftPressed = true;
@@ -77,10 +66,9 @@ public class Controller {// after creating draw method and typing stage.draw the
                 leftPressed = false;
             }
         });
-        Image rightImage=new Image(new Texture("flatDark24.png"));
-        rightImage.setSize(50, 50);
-        rightImage.addListener(new InputListener() {
-
+        buttonRight = new Image(new Texture("buttonright.png"));
+        buttonRight.setSize(65, 65);
+        buttonRight.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 rightPressed = true;
@@ -92,32 +80,26 @@ public class Controller {// after creating draw method and typing stage.draw the
                 rightPressed = false;
             }
         });
-        //now we want to add images to the table, the table should be like tic tac toe game with 9 cells
-        table.add();
-        table.add(upImage).size(upImage.getWidth(), upImage.getHeight());
-        table.add();
-        table.row().pad(5, 5, 5, 5);
-        table.add(leftImage).size(leftImage.getWidth(), leftImage.getHeight());
-        table.add();
-        table.add(rightImage).size(rightImage.getWidth(), rightImage.getHeight());
-        table.row().padBottom(5);
-        table.add();
-        table.add(downImage).size(downImage.getWidth(), downImage.getHeight());
-        table.add();
-        stage.addActor(table);
 
+        //Table with buttons.
+        table = new Table();
+        table.left().bottom(); //Align to the left bottom.
+        table.add(buttonLeft).size(buttonLeft.getWidth(), buttonLeft.getHeight()).spaceRight((viewport.getWorldWidth()/10)*6.5f);
+
+        table.add(buttonRight).size(buttonRight.getWidth(), buttonRight.getHeight());
+
+
+        stage.addActor(table);
     }
-    public void draw()
-    {
+    public void draw() {
         stage.draw();
     }
 
+    public void resize(int width, int height) {
+        viewport.update(width, height);
+    }
     public boolean isUpPressed() {
         return upPressed;
-    }
-
-    public boolean isDownPressed() {
-        return downPressed;
     }
 
     public boolean isLeftPressed() {
@@ -127,8 +109,6 @@ public class Controller {// after creating draw method and typing stage.draw the
     public boolean isRightPressed() {
         return rightPressed;
     }
-    public void resize(int width,int height)
-    {
-        viewport.update(width,height);
-    }
+
 }
+
