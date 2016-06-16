@@ -54,7 +54,7 @@ public class Hud implements Disposable {
         timecount = 0;
         score = 0;
         lives = 3;
-        noApple = noBanana = noOrange = noWatermelon = noStrawberry = 0;
+        
         viewport = new FitViewport(Fruits.V_WIDTH, Fruits.V_HIEGT, new OrthographicCamera());//2
         stage = new Stage(viewport, sb);//stage is as box and try to put widget and organize things inside that table
         countdownLabel = new Label(String.format("%01d", worldTimer), new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
@@ -134,36 +134,13 @@ public class Hud implements Disposable {
     public void updatetable() {
         if (score < ((level * 15) + 50) / 10)
             loading = new Image(new Texture("0%.png"));
-        if (score > ((level * 15) + 50) / 10 && score < (((level * 18) + 50) / 10) * 2) {
-            loading = new Image(new Texture("10%.png"));
-
-        }
-        if (score >= (((level * 15) + 50) / 10) * 2 && score < (((level * 18) + 50) / 10) * 3) {
-            loading = new Image(new Texture("25%.png"));
-        }
-        if (score >= (((level * 15) + 50) / 10) * 3 && score < (((level * 18) + 50) / 10) * 4) {
-            loading = new Image(new Texture("40%.png"));
-        }
-        if (score >= (((level * 15) + 50) / 10) * 4 && score < (((level * 18) + 50) / 10) * 5) {
-            loading = new Image(new Texture("50%.png"));
-
-        }
-        if (score >= (((level * 15) + 50) / 10) * 5 && score < (((level * 18) + 50) / 10) * 7) {
-            loading = new Image(new Texture("70%.png"));
-
-        }
-        if (score >= (((level * 15) + 50) / 10) * 7 && score < (((level * 18) + 50) / 10) * 8) {
-            loading = new Image(new Texture("80%.png"));
-
-        }
-
+    
         if (score >= (((level * 15) + 50) / 10) * 8 && score < (((level * 18) + 50) / 10) * 9) {
             loading = new Image(new Texture("90%.png"));
 
         }
         if (score >= ((level * 15) + 50)) {
             loading = new Image(new Texture("100%.png"));
-
         }
 
         table.reset();
@@ -192,27 +169,7 @@ public class Hud implements Disposable {
     public static void addScore(int value, int type) {
         score += value;
         scorelabel.setText(String.format("%02d", score));
-        if (type == 5) {
-            noApple++;
-            appleNum.setText(String.format("%01d", noApple));
-        }
-        if (type == 4) {
-            noStrawberry++;
-            strawNum.setText(String.format("%01d", noStrawberry));
-        }
-        if (type == 3) {
-            noWatermelon++;
-            watermelonNum.setText(String.format("%01d", noWatermelon));
-        }
-        if (type == 2) {
-            noBanana++;
-            bananaNum.setText(String.format("%01d", noBanana));
-        }
-        if (type == 1) {
-            noOrange++;
-            orangeNum.setText(String.format("%01d", noOrange));
-        }
-    }
+         }
 
     public static void collectorLives(int value) {
         lives = value;
@@ -242,47 +199,5 @@ public class Hud implements Disposable {
             levellabel = new Label("1-2", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
         if (level == 3)
             levellabel = new Label("1-3", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 4)
-            levellabel = new Label("1-4", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 5)
-            levellabel = new Label("1-5", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 6)
-            levellabel = new Label("1-6", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 7)
-            levellabel = new Label("2-1", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 8)
-            levellabel = new Label("2-2", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 9)
-            levellabel = new Label("2-3", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 10)
-            levellabel = new Label("2-4", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 11)
-            levellabel = new Label("2-5", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 12)
-            levellabel = new Label("2-6", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 13)
-            levellabel = new Label("3-1", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 14)
-            levellabel = new Label("3-2", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 15)
-            levellabel = new Label("3-3", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 16)
-            levellabel = new Label("3-4", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 17)
-            levellabel = new Label("3-5", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 18)
-            levellabel = new Label("3-6", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 19)
-            levellabel = new Label("4-1", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 20)
-            levellabel = new Label("4-2", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 21)
-            levellabel = new Label("4-3", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 22)
-            levellabel = new Label("4-4", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 23)
-            levellabel = new Label("4-5", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
-        if (level == 24)
-            levellabel = new Label("4-6", new Label.LabelStyle(new BitmapFont(), Color.YELLOW));//label for gdx
     }
 }
