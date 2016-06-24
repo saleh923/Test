@@ -6,8 +6,10 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -15,7 +17,16 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IdentityMap;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Controller;
@@ -45,6 +56,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class PlayScreen implements Screen {
     private Fruits game;
+
     private TextureAtlas atlas;
     private OrthographicCamera gamecam;
     private Viewport gameport;
@@ -66,6 +78,7 @@ public class PlayScreen implements Screen {
     public float temp;
     public Basket basket;
     private Controller controller;
+    private MainMenu mainMenu;
     private Array<Item> items;
     private ArrayList<Apple> apples;
     private ArrayList<Rocks> rocks;
@@ -84,25 +97,36 @@ public class PlayScreen implements Screen {
     private float velocity;
     private float level;
     Preferences prefs;
+    //private MainMenu mainMenu;
+    private Window.WindowStyle ws;
     private boolean pausestate;
+    private Dialog dialog;
+
+
 
     public PlayScreen(Fruits game, float level)
     {
         this.level=level;
         this.game=game;
         gamecam=new OrthographicCamera();
+
         gameport=new FitViewport(Fruits.V_WIDTH/Fruits.PPM,Fruits.V_HIEGT/Fruits.PPM,gamecam);
+
         hud=new Hud(game.batch,level);
         atlas=new TextureAtlas("mypack.pack");
         mapLoader=new TmxMapLoader();
         if(level<7)
-            map=mapLoader.load("World1.tmx");
+            map=mapLoader.load("world10.tmx");
         else if(level>=7&&level<13)
             map=mapLoader.load("World2.tmx");
         else if(level>=13&&level<19)
             map=mapLoader.load("World3.tmx");
-        else if(level>=19)
+        else if(level>=19&& level<25)
             map=mapLoader.load("World4.tmx");
+        else if(level>=25&& level<31)
+            map=mapLoader.load("World6.tmx");
+        else if(level>=31)
+            map=mapLoader.load("World5.tmx");
         renderer=new OrthogonalTiledMapRenderer(map,1/Fruits.PPM);
         gamecam.position.set(gameport.getWorldWidth()/2,gameport.getWorldHeight()/2f,0);
         globalcounter=100;
@@ -112,6 +136,7 @@ public class PlayScreen implements Screen {
         player=new Collector(world,this,level);
         world.setContactListener(new WorldContactListener());
         controller=new Controller(game.batch);
+        //mainMenu=new MainMenu(game.batch);
         appleNum=130;
         rocksNum=200;
         watermelonNum=130;
@@ -135,13 +160,13 @@ public class PlayScreen implements Screen {
         counter1=counter2=counter3=counter4=counter5=0;
         //basket=new Basket(this,)
         music=Fruits.manager.get("music/Backmusic.ogg", Music.class);
-        music.setLooping(true);
         music.play();
+        music.setLooping(true);
+
+
         pausestate=false;
-        levelParameters(level,1);
-        Gdx.app.log(Float.toString(level), "current level");
-
-
+        levelParameters(level, 1);
+        //Gdx.app.log(Float.toString(level), "current level");
     }
     @Override
     public void show()
@@ -216,7 +241,7 @@ public class PlayScreen implements Screen {
     {
         Random random=new Random();
         boolean b=true;
-        int x=random.nextInt(350 - 30 ) + 30;
+        int x=random.nextInt(310 - 50 ) + 50;
 
         rocks.add(new Rocks(world, this, x, 100,level));
 
@@ -237,25 +262,23 @@ public class PlayScreen implements Screen {
             //if(left)
                 player.b2body.applyLinearImpulse(new Vector2(-0.15f, 0), player.b2body.getWorldCenter(), true);//5
          }
-        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-
-            if (pausestate)
-                pausestate = false;
-            else
-                pausestate=true;
+        if(controller.isUpPressed()||(Gdx.input.isKeyJustPressed(Input.Keys.BACK))||(Gdx.input.isButtonPressed(Input.Keys.HOME))) {
+            controller.table2visible(true);
+            controller.table1visible(false);
+            pausestate = true;
         }
-       /* if(hud.isPauseClick())
+        if(controller.isRestartPressed())
         {
-            if(pausestate){
-                pause();
-                pausestate=false;
-            }
-            else
-            {
-                resume();
-                pausestate=true;
-            }
-        }*/
+            game.setScreen(new PlayScreen(game,level));
+        }
+        if(controller.isExitPressed())
+            game.setScreen(new Worlds(game, level));
+        if (controller.isresumePressed())
+        {
+            controller.table2visible(false);
+            controller.table1visible(true);
+            pausestate = false;
+        }
     }
     public void update(float dt)
     {
@@ -331,23 +354,16 @@ public class PlayScreen implements Screen {
 
     @Override
     public void render(float delta) {
-
-
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if(pausestate) {
 
-                try {
-                    Thread.sleep(100);
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-
+            handleinput(delta);
+            Fruits.manager.get("music/Backmusic.ogg", Music.class).pause();
         }
         else
         {
+            Fruits.manager.get("music/Backmusic.ogg", Music.class).play();
             update(delta);
         }
 
@@ -383,6 +399,7 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
         hud.stage.draw();
         controller.draw();
+       // mainMenu.draw();
         if(gameOver())//24
         {
             gameisover=true;
@@ -409,14 +426,13 @@ public class PlayScreen implements Screen {
                 prefs.putString("level", Float.toString(level + 1));
                 prefs.flush();
             }
-            else if(Float.valueOf(name)>level)
-                Gdx.app.log(name,"levelstrored");
+
             else {
-                Gdx.app.log(name, "level");
+
                 prefs.putString("level", Float.toString(level+1));
                 prefs.flush();
             }
-            game.setScreen(new Worlds(game,level+1));
+            game.setScreen(new Celebration(game,level+1));
             dispose();
         }
     }
@@ -440,14 +456,16 @@ public class PlayScreen implements Screen {
     }
     @Override
     public void resize(int width, int height) {
-        gameport.update(width,height);
+        gameport.update(width, height);
         controller.resize(width, height);
+       // mainMenu.resize(width,height);
     }
 
     @Override
     public void pause() {
-       // this.pause();
-
+        controller.table2visible(true);
+        controller.table1visible(false);
+        pausestate = true;
     }
 
     @Override
@@ -501,7 +519,7 @@ public class PlayScreen implements Screen {
                }
               // bananaNum=bananaNum-((i*6)+(6/i));
                else if(type==6) {
-                   x=random.nextInt(height - low ) + low;
+                   x=random.nextInt((height-5*Math.round(level)) - low ) + low;
                    rocksNum = x;
                }
                    rocksNum=rocksNum;
@@ -510,8 +528,12 @@ public class PlayScreen implements Screen {
            velocity=1.3f;
            if(level>=3&& level<8)
                velocity=1.5f;
-           if(level>=8)
+           if(level>=8&& level<20)
                velocity=1.7f;
+           if(level>=20)
+               velocity=1.9f;
        }
     }
+
+
 }
